@@ -34,6 +34,18 @@ using namespace CTAG::AUDIO;
 using namespace boost::property_tree;
 
 void returnFile(boost::filesystem::path path, shared_ptr<HttpServer::Response> response, SimpleWeb::CaseInsensitiveMultimap header) {
+    if (path.extension() == ".json") {
+        header.emplace("Content-Type", "application/json");
+    } else if (path.extension() == ".js") {
+        header.emplace("Content-Type", "application/javascript");
+    } else if (path.extension() == ".css") {
+        header.emplace("Content-Type", "text/css");
+    } else if (path.extension() == ".html") {
+        header.emplace("Content-Type", "text/html");
+    } else {
+        header.emplace("Content-Type", "text/plain");
+    }
+
     auto ifs = make_shared<ifstream>();
     ifs->open(path.string(), ifstream::in | ios::binary | ios::ate);
 
@@ -166,6 +178,7 @@ void WebServer::Start() {
                 throw invalid_argument("path must be within root path");
 
             SimpleWeb::CaseInsensitiveMultimap header;
+            header.emplace("Content-Type", "application/json");
 
             // Uncomment the following line to enable Cache-Control
             // header.emplace("Cache-Control", "max-age=86400");
@@ -193,6 +206,7 @@ void WebServer::Start() {
                 throw invalid_argument("path must be within root path");
 
             SimpleWeb::CaseInsensitiveMultimap header;
+            header.emplace("Content-Type", "application/json");
 
             // Uncomment the following line to enable Cache-Control
             // header.emplace("Cache-Control", "max-age=86400");
