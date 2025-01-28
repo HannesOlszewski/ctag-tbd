@@ -1,42 +1,52 @@
-import { $channelPresets, type Channel } from "../stores/pluginsStore";
-import { useStore } from "@nanostores/preact";
+import { $channelPresets, type Channel } from "@/stores/pluginsStore";
+import { useStore } from "@nanostores/react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface LoadChannelPresetProps {
-  channel: Channel;
+	channel: Channel;
 }
 
 export default function LoadChannelPreset({ channel }: LoadChannelPresetProps) {
-  const { activePresetNumber, presets } =
-    useStore($channelPresets)[channel] ?? {};
+	const { activePresetNumber, presets } =
+		useStore($channelPresets)[channel] ?? {};
 
-  const handleClick = (presetNumber: number) => {
-    if (!presets) {
-      return;
-    }
+	const handleClick = (presetNumber: number) => {
+		if (!presets) {
+			return;
+		}
 
-    fetch(`/api/v1/loadPreset/${channel}?number=${presetNumber}`).then((r) => {
-      if (r.ok) {
-        $channelPresets.setKey(channel, {
-          presets,
-          activePresetNumber: presetNumber,
-        });
-      }
-    });
-  };
+		fetch(`/api/v1/loadPreset/${channel}?number=${presetNumber}`).then((r) => {
+			if (r.ok) {
+				$channelPresets.setKey(channel, {
+					presets,
+					activePresetNumber: presetNumber,
+				});
+			}
+		});
+	};
 
-  return (
-    <ul class="menu bg-base-200 rounded-box">
-      {presets?.map((preset) => (
-        <li
-          key={preset.number}
-          onClick={() => handleClick(preset.number)}
-          class={preset.number === activePresetNumber ? "font-bold" : ""}
-        >
-          <a>
-            {preset.number}: {preset.name}
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
+	return (
+		<RadioGroup
+			value={activePresetNumber?.toString()}
+			onValueChange={(value) => {
+				const newValue = Number.parseInt(value, 10);
+
+				if (!Number.isNaN(newValue)) {
+					handleClick(newValue);
+				}
+			}}
+		>
+			{presets?.map((preset) => (
+				<div className="flex items-center space-x-2">
+					<RadioGroupItem
+						key={preset.number}
+						value={preset.number.toString()}
+						id={`option-${preset.number}`}
+					/>
+					<Label htmlFor={`option-${preset.number}`}>{preset.name}</Label>
+				</div>
+			))}
+		</RadioGroup>
+	);
 }

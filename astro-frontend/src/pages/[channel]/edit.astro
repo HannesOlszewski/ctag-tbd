@@ -1,6 +1,6 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import PluginParams from "../../components/PluginParams";
+import Layout from "@/layouts/Layout.astro";
+import PluginParams from "@/components/PluginParams";
 
 export function getStaticPaths() {
   return [{ params: { channel: "0" } }, { params: { channel: "1" } }];

@@ -1,6 +1,6 @@
 ---
-import "../globals.css";
-import Navbar from "../components/Navbar.astro";
+import "@/globals.css";
+import Navbar from "@/components/Navbar.tsx";
 
 interface Props {
   title: string;
@@ -21,9 +21,35 @@ const { title } = Astro.props;
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>CTAG-TBD</title>
+    <script is:inline>
+      const getThemePreference = () => {
+        if (
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem("theme")
+        ) {
+          return localStorage.getItem("theme");
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      };
+      const isDark = getThemePreference() === "dark";
+      document.documentElement.classList[isDark ? "add" : "remove"]("dark");
+
+      if (typeof localStorage !== "undefined") {
+        const observer = new MutationObserver(() => {
+          const isDark = document.documentElement.classList.contains("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+      }
+    </script>
   </head>
   <body>
-    <Navbar title={title} />
+    <Navbar title={title} url={Astro.url.pathname} client:load />
     <slot />
   </body>
 </html>

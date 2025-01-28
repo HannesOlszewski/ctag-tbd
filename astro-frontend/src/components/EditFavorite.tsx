@@ -1,82 +1,79 @@
-import { useStore } from "@nanostores/preact";
-import { $favorites, type FavoritePreset } from "../stores/favoritesStore";
-import { useEffect, useState } from "preact/hooks";
+import { useStore } from "@nanostores/react";
+import { $favorites, type FavoritePreset } from "@/stores/favoritesStore";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export interface EditFavoriteProps {
-  num: number;
-  favoriteData?: FavoritePreset;
+	num: number;
+	favoriteData?: FavoritePreset;
 }
 
 export default function EditCurrrentFavorite({
-  num,
-  favoriteData,
+	num,
+	favoriteData,
 }: EditFavoriteProps) {
-  const favorites = useStore($favorites);
-  const currentFavorite = favoriteData ?? favorites.at(num);
-  const [name, setName] = useState<string>("");
-  const [ustring, setUstring] = useState<string>("");
+	const favorites = useStore($favorites);
+	const currentFavorite = favoriteData ?? favorites.at(num);
+	const [name, setName] = useState<string>("");
+	const [ustring, setUstring] = useState<string>("");
 
-  useEffect(() => {
-    if (currentFavorite) {
-      setName(currentFavorite.name);
-      setUstring(currentFavorite.ustring);
-    }
-  }, [currentFavorite]);
+	useEffect(() => {
+		if (currentFavorite) {
+			setName(currentFavorite.name);
+			setUstring(currentFavorite.ustring);
+		}
+	}, [currentFavorite]);
 
-  const handleSave = async () => {
-    if (!currentFavorite) {
-      return;
-    }
+	const handleSave = async () => {
+		if (!currentFavorite) {
+			return;
+		}
 
-    const data: FavoritePreset = {
-      ...currentFavorite,
-      name,
-      ustring,
-    };
+		const data: FavoritePreset = {
+			...currentFavorite,
+			name,
+			ustring,
+		};
 
-    const response = await fetch(`/api/v1/favorites/store/${num}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+		const response = await fetch(`/api/v1/favorites/store/${num}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
 
-    if (response.ok) {
-      favorites[num] = data;
-      $favorites.set(favorites);
-    }
-  };
+		if (response.ok) {
+			favorites[num] = data;
+			$favorites.set(favorites);
+		}
+	};
 
-  return (
-    <div>
-      <label className="form-control w-full max-w-xs">
-        <div className="label">
-          <span className="label-text">Name</span>
-        </div>
-        <input
-          type="text"
-          className="input input-bordered w-full max-w-xs"
-          value={name}
-          onChange={(e) => setName(e.currentTarget.value)}
-        />
-      </label>
+	return (
+		<>
+			<div className="grid w-full max-w-sm items-center gap-1.5">
+				<Label htmlFor="name">Name </Label>
+				<Input
+					id="name"
+					type="text"
+					value={name}
+					onChange={(e) => setName(e.target.value)}
+				/>
+			</div>
 
-      <label className="form-control w-full max-w-xs">
-        <div className="label">
-          <span className="label-text">User String</span>
-        </div>
-        <input
-          type="text"
-          className="input input-bordered w-full max-w-xs"
-          value={ustring}
-          onChange={(e) => setUstring(e.currentTarget.value)}
-        />
-      </label>
+			<div className="grid w-full max-w-sm items-center gap-1.5">
+				<Label htmlFor="ustring">User String</Label>
+				<Input
+					id="ustring"
+					type="text"
+					value={ustring}
+					onChange={(e) => setUstring(e.target.value)}
+				/>
+			</div>
 
-      <button className="btn" onClick={handleSave}>
-        Save
-      </button>
-    </div>
-  );
+			<Button onClick={handleSave}>Save</Button>
+		</>
+	);
 }

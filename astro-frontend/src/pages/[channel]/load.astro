@@ -1,7 +1,7 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import LoadChannelPreset from "../../components/LoadChannelPreset";
-import type { Channel } from "../../stores/pluginsStore";
+import Layout from "@/layouts/Layout.astro";
+import LoadChannelPreset from "@/components/LoadChannelPreset";
+import type { Channel } from "@/stores/pluginsStore";
 
 export function getStaticPaths() {
   return [{ params: { channel: "0" } }, { params: { channel: "1" } }];
